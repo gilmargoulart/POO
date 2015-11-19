@@ -11,11 +11,22 @@ public class Conexao {
 	public Statement stmt;
 	public ResultSet rs;
 	private String driver = "com.mysq.jdbc.Driver";
+	
+	///*
+	private String user = "b231614c0153ae";
+	private String password = "e78733b8";
+	private String host = "br-cdbr-azure-south-a.cloudapp.net";
+	private String port = "3306";
+	private String bd = "poo_contrato";
+	//*/
+	
+	/*
 	private String user = "root";
 	private String password = "root";
 	private String host = "localhost";
 	private String port = "3306";
-	private String bd = "bd_poo_agenda";
+	private String bd = "bd_poo_contratos";
+	*/
 	
 	private String connectionString = "jdbc:mysql://" + this.host + ":" + this.port + "/" + this.bd;
 	
@@ -39,6 +50,4 @@ public class Conexao {
 			System.out.println("Não foi possível desconectar. \nErro: " + e.getMessage());
 		}
 	}
-	
-	
 }

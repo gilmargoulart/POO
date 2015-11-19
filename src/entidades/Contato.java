@@ -26,7 +26,7 @@ public class Contato {
 	public Contato(int codigo){
 		Conexao c = new Conexao();
 		String sqlStmt = "SELECT "
-				+ "`ContatoCodigo`, `ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmaill` "
+				+ "`ContatoCodigo`, `ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail` "
 				+ "FROM `contato` "
 				+ "WHERE `ContatoCodigo` = ?;";
 		
@@ -43,7 +43,7 @@ public class Contato {
 				setNome(rs.getString("ContatoNome"));
 				setEndereco(rs.getString("ContatoEndereco"));
 				setNumeroTelefone(rs.getString("ContatoNumeroTelefone"));
-				setEmail(rs.getString("ContatoEmaill"));
+				setEmail(rs.getString("ContatoEmail"));
 			} else {
 				setCodigo(0);
 			}
@@ -60,7 +60,7 @@ public class Contato {
 	public void Inserir() {
 		Conexao c = new Conexao();
 		String sqlStmt = "INSERT INTO `contato` "
-				+ "(`ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmaill`) "
+				+ "(`ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail`) "
 				+ "VALUES (?, ?, ?, ?);";
 		
 		try {
@@ -91,7 +91,7 @@ public class Contato {
 		ArrayList<Contato> contatos = new ArrayList<Contato>();
 		Conexao c = new Conexao();
 		String sqlStmt = "SELECT "
-				+ "`ContatoCodigo`, `ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmaill`"
+				+ "`ContatoCodigo`, `ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail`"
 				+ "FROM `contato` ";
 		if (!sqlStmt.isEmpty()){
 			sqlStmt += "WHERE `ContatoNome` LIKE \"%\"?\"%\";";
@@ -108,7 +108,7 @@ public class Contato {
 			ResultSet rs = p.executeQuery();
 			
 			while (rs.next()) {
-				contatos.add(new Contato(rs.getInt("ContatoCodigo"), rs.getString("ContatoNome"), rs.getString("ContatoEndereco"), rs.getString("ContatoNumeroTelefone"), rs.getString("ContatoEmaill")));
+				contatos.add(new Contato(rs.getInt("ContatoCodigo"), rs.getString("ContatoNome"), rs.getString("ContatoEndereco"), rs.getString("ContatoNumeroTelefone"), rs.getString("ContatoEmail")));
 			}
 			
 		} catch (SQLException e) {
@@ -135,7 +135,7 @@ public class Contato {
 				+ "`ContatoNome` = ?,"
 				+ " `ContatoEndereco` = ?,"
 				+ " `ContatoNumeroTelefone` = ?,"
-				+ " `ContatoEmaill` = ?"
+				+ " `ContatoEmail` = ?"
 				+ " WHERE `ContatoCodigo` = ?;";
 		
 		try {
