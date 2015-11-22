@@ -10,11 +10,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
-import conexao.Conexao;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.UIManager;
+
+import utils.ConstantesSistema;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainProgram {
 
@@ -30,16 +34,22 @@ public class MainProgram {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					ConstantesSistema.inicioSistema();
 					MainProgram window = new MainProgram();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				Conexao c = new Conexao();
-				c.conect();
 			}
 		});
 	}
@@ -56,6 +66,12 @@ public class MainProgram {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		this.frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				ConstantesSistema.fecharConexoes();
+			}
+		});
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -72,23 +88,21 @@ public class MainProgram {
 		mntmSair.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
+				ConstantesSistema.sairSistema();
 			}
 		});
 		mnArquivo.add(mntmSair);
 		
 		mnCadastros = new JMenu("Cadastros");
-		mnCadastros.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				new CentralContato().setVisible(true);
-			}
-		});
 		menuBar.add(mnCadastros);
 		
 		mntmContato = new JMenuItem("Contato");
+		mntmContato.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				CentralContato cc = new CentralContato();
+				cc.setVisible(true);
+			}
+		});
 		mnCadastros.add(mntmContato);
 	}
 

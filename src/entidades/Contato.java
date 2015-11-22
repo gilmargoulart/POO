@@ -24,16 +24,13 @@ public class Contato {
 	}
 	
 	public Contato(int codigo){
-		Conexao c = new Conexao();
 		String sqlStmt = "SELECT "
 				+ "`ContatoCodigo`, `ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail` "
 				+ "FROM `contato` "
 				+ "WHERE `ContatoCodigo` = ?;";
 		
 		try {
-			PreparedStatement p;
-			c.conect();
-			p = c.connection.prepareStatement(sqlStmt);
+			PreparedStatement p = Conexao.getConnection().prepareStatement(sqlStmt);
 			p.setInt(1, codigo);
 			
 			ResultSet rs = p.executeQuery();
@@ -52,21 +49,16 @@ public class Contato {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			c.disconnect();
 		}
 	}
 	
 	public void Inserir() {
-		Conexao c = new Conexao();
 		String sqlStmt = "INSERT INTO `contato` "
 				+ "(`ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail`) "
 				+ "VALUES (?, ?, ?, ?);";
 		
 		try {
-			PreparedStatement p;
-			c.conect();
-			p = c.connection.prepareStatement(sqlStmt);
+			PreparedStatement p = Conexao.getConnection().prepareStatement(sqlStmt);
 			p.setString(1, getNome());
 			p.setString(2, getEndereco());
 			p.setString(3, getNumeroTelefone());
@@ -82,14 +74,11 @@ public class Contato {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			c.disconnect();
 		}
 	}
 	
 	public static ArrayList<Contato> consultarContatoPorNome(String nome) {
 		ArrayList<Contato> contatos = new ArrayList<Contato>();
-		Conexao c = new Conexao();
 		String sqlStmt = "SELECT "
 				+ "`ContatoCodigo`, `ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail`"
 				+ "FROM `contato` ";
@@ -98,9 +87,7 @@ public class Contato {
 		}
 		
 		try {
-			PreparedStatement p;
-			c.conect();
-			p = c.connection.prepareStatement(sqlStmt);
+			PreparedStatement p = Conexao.getConnection().prepareStatement(sqlStmt);
 			if (!sqlStmt.isEmpty()){
 				p.setString(1, nome);
 			}
@@ -115,8 +102,6 @@ public class Contato {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			c.disconnect();
 		}
 		return contatos;
 	}
@@ -130,7 +115,6 @@ public class Contato {
 	}
 	
 	public void Alterar(){
-		Conexao c = new Conexao();
 		String sqlStmt = "UPDATE `contato` SET "
 				+ "`ContatoNome` = ?,"
 				+ " `ContatoEndereco` = ?,"
@@ -139,9 +123,7 @@ public class Contato {
 				+ " WHERE `ContatoCodigo` = ?;";
 		
 		try {
-			PreparedStatement p;
-			c.conect();
-			p = c.connection.prepareStatement(sqlStmt);
+			PreparedStatement p = Conexao.getConnection().prepareStatement(sqlStmt);
 			p.setString(1, getNome());
 			p.setString(2, getEndereco());
 			p.setString(3, getNumeroTelefone());
@@ -160,8 +142,6 @@ public class Contato {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			c.disconnect();
 		}
 	}
 
@@ -171,13 +151,10 @@ public class Contato {
 			int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja realmente deletar o contato selecionado?", "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			
 			if (confirmacao == JOptionPane.YES_OPTION) {
-				Conexao c = new Conexao();
 				String sqlStmt = "DELETE FROM `contato` WHERE `ContatoCodigo` = ?;";
 				
 				try {
-					PreparedStatement p;
-					c.conect();
-					p = c.connection.prepareStatement(sqlStmt);
+					PreparedStatement p = Conexao.getConnection().prepareStatement(sqlStmt);
 					p.setInt(1, getCodigo());
 					
 					int rowsAffected = p.executeUpdate();
@@ -192,8 +169,6 @@ public class Contato {
 					e.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
-				} finally {
-					c.disconnect();
 				}
 			} else {
 				JOptionPane.showMessageDialog(null, "Contato não deletado.", "Contato não deletado.", JOptionPane.INFORMATION_MESSAGE);

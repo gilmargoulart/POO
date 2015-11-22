@@ -30,7 +30,7 @@ public class Conexao {
 	
 	private String connectionString = "jdbc:mysql://" + this.host + ":" + this.port + "/" + this.bd;
 	
-	public Connection connection;
+	private static Connection connection;
 	
 	public void conect(){
 		try {
@@ -44,10 +44,23 @@ public class Conexao {
 	
 	public void disconnect(){
 		try {
-			connection.close();
-			System.out.println("Conexão encerrada com sucesso.");
+			if (connection != null) {
+				connection.close();
+				System.out.println("Conexão encerrada com sucesso.");
+			}
 		} catch (SQLException e) {
 			System.out.println("Não foi possível desconectar. \nErro: " + e.getMessage());
 		}
+	}
+	
+	public static Connection getConnection() throws SQLException{
+		if (connection == null) {
+			new Conexao().conect();
+		} else {
+			if (connection.isClosed()) {
+				new Conexao().conect();
+			}
+		}
+		return connection;
 	}
 }
