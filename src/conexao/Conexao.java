@@ -2,14 +2,12 @@ package conexao;
 
 import java.sql.Connection; //Conexão com banco de dados
 import java.sql.DriverManager; //Driver - Carregar drvifer MySQl, SQL Server, Oracle, etc...
-import java.sql.ResultSet; //Dados de retorno da query executada 
 import java.sql.SQLException; //Exceções
-import java.sql.Statement; //Query
+
+import utils.Msg;
 
 public class Conexao {
 	
-	public Statement stmt;
-	public ResultSet rs;
 	private String driver = "com.mysq.jdbc.Driver";
 	
 	///*
@@ -34,9 +32,11 @@ public class Conexao {
 	
 	public void conect(){
 		try {
+			Msg.MsgStatusBar("Estabelecendo conexão com o servidor...", false);
 			System.setProperty("jdbc.Drivers", this.driver);
 			connection = DriverManager.getConnection(connectionString, this.user, this.password);
 			System.out.println("Conexão efetuada com sucesso!");
+			Msg.MsgStatusBar("Estabelecendo conexão com o servidor... OK");
 		} catch (Exception e) {
 			System.out.println("Não foi possível conectar. \nErro: " + e.getMessage());
 		}
@@ -45,10 +45,13 @@ public class Conexao {
 	public void disconnect(){
 		try {
 			if (connection != null) {
+				Msg.MsgStatusBar("Encerrando conexão com o servidor...", false);
 				connection.close();
+				Msg.MsgStatusBar("Encerrando conexão com o servidor... OK", true);
 				System.out.println("Conexão encerrada com sucesso.");
 			}
 		} catch (SQLException e) {
+			Msg.MsgStatusBar("Encerrando conexão com o servidor... Erro!", true);
 			System.out.println("Não foi possível desconectar. \nErro: " + e.getMessage());
 		}
 	}

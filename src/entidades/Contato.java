@@ -3,10 +3,10 @@ package entidades;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import utils.Msg;
 import conexao.Conexao;
 
 
@@ -52,7 +52,8 @@ public class Contato {
 		}
 	}
 	
-	public void Inserir() {
+	public boolean Inserir() {
+		boolean isInserted = false;
 		String sqlStmt = "INSERT INTO `contato` "
 				+ "(`ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail`) "
 				+ "VALUES (?, ?, ?, ?);";
@@ -67,7 +68,8 @@ public class Contato {
 			int rowsAffected = p.executeUpdate();
 			
 			if (rowsAffected > 0) {
-				JOptionPane.showMessageDialog(null, "Contato cadastrado com sucesso.", "Contato cadastrado", JOptionPane.INFORMATION_MESSAGE);
+				isInserted = true;
+				Msg.Informacao("Contato cadastrado com sucesso", "Contato cadastrado");
 			}
 			
 		} catch (SQLException e) {
@@ -75,35 +77,7 @@ public class Contato {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static ArrayList<Contato> consultarContatoPorNome(String nome) {
-		ArrayList<Contato> contatos = new ArrayList<Contato>();
-		String sqlStmt = "SELECT "
-				+ "`ContatoCodigo`, `ContatoNome`, `ContatoEndereco`, `ContatoNumeroTelefone`, `ContatoEmail`"
-				+ "FROM `contato` ";
-		if (!sqlStmt.isEmpty()){
-			sqlStmt += "WHERE `ContatoNome` LIKE \"%\"?\"%\";";
-		}
-		
-		try {
-			PreparedStatement p = Conexao.getConnection().prepareStatement(sqlStmt);
-			if (!sqlStmt.isEmpty()){
-				p.setString(1, nome);
-			}
-			
-			ResultSet rs = p.executeQuery();
-			
-			while (rs.next()) {
-				contatos.add(new Contato(rs.getInt("ContatoCodigo"), rs.getString("ContatoNome"), rs.getString("ContatoEndereco"), rs.getString("ContatoNumeroTelefone"), rs.getString("ContatoEmail")));
-			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return contatos;
+		return isInserted;
 	}
 	
 	public Contato(int codigo, String nome, String endereco, String numeroTelefone, String email) {
@@ -114,7 +88,9 @@ public class Contato {
 		setEmail(email);
 	}
 	
-	public void Alterar(){
+	public boolean Alterar(){
+		boolean isUpdated = false;
+		
 		String sqlStmt = "UPDATE `contato` SET "
 				+ "`ContatoNome` = ?,"
 				+ " `ContatoEndereco` = ?,"
@@ -133,9 +109,10 @@ public class Contato {
 			int rowsAffected = p.executeUpdate();
 			
 			if (rowsAffected > 0) {
-				JOptionPane.showMessageDialog(null, "Contato alterado com sucesso.", "Contato alterado", JOptionPane.INFORMATION_MESSAGE);
+				isUpdated = true;
+				Msg.Informacao("Contato alterado com sucesso.", "Contato alterado");
 			} else {
-				JOptionPane.showMessageDialog(null, "Contato não foi alterado.", "Contato não alterado", JOptionPane.WARNING_MESSAGE);
+				Msg.Aviso("Contato não foi alterado.", "Contato não alterado");
 			}
 			
 		} catch (SQLException e) {
@@ -143,13 +120,17 @@ public class Contato {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		return isUpdated;
 	}
 
-	public void Deletar(){
+	public boolean Deletar(){
+		
+		boolean isDeleted = false;
 		
 		if (getCodigo() > 0) {
+			Msg.MsgStatusBar("Deletando contato...", false);
 			int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja realmente deletar o contato selecionado?", "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-			
 			if (confirmacao == JOptionPane.YES_OPTION) {
 				String sqlStmt = "DELETE FROM `contato` WHERE `ContatoCodigo` = ?;";
 				
@@ -160,22 +141,30 @@ public class Contato {
 					int rowsAffected = p.executeUpdate();
 					
 					if (rowsAffected > 0) {
-						JOptionPane.showMessageDialog(null, "Contato deletado com sucesso.", "Contato deletado", JOptionPane.INFORMATION_MESSAGE);
+						isDeleted = true;
+						Msg.MsgStatusBar("Deletando contato... OK");
+						Msg.Informacao("Contato deletado com sucesso.", "Contato deletado");
 					} else {
-						JOptionPane.showMessageDialog(null, "Contato não foi deletado.", "Contato não deletado", JOptionPane.WARNING_MESSAGE);
+						Msg.MsgStatusBar("Deletando contato... Contato não deletado!");
+						Msg.Aviso("Contato não foi deletado.", "Contato não deletado");
 					}
 					
 				} catch (SQLException e) {
+					Msg.MsgStatusBar("Deletando contato... Erro!");
 					e.printStackTrace();
 				} catch (Exception e) {
+					Msg.MsgStatusBar("Deletando contato... Erro!");
 					e.printStackTrace();
 				}
 			} else {
-				JOptionPane.showMessageDialog(null, "Contato não deletado.", "Contato não deletado.", JOptionPane.INFORMATION_MESSAGE);
+				Msg.MsgStatusBar("Deletando contato... Contato não deletado! Ação cancelada pelo usuário.");
+				Msg.Informacao("Contato não deletado.", "Contato não deletado");
 			}
 		} else {
-			JOptionPane.showMessageDialog(null, "Contato não deletado, pois não foi encontrado", "Contato não deletado.", JOptionPane.INFORMATION_MESSAGE);
+			Msg.Aviso("Contato não deletado, pois não foi encontrado", "Contato não deletado");
 		}
+		
+		return isDeleted;
 	}
 	
 	public void exibirDados() {

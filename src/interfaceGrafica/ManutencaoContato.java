@@ -12,7 +12,17 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JProgressBar;
 
-public class ManutencaoContrato extends JFrame {
+import utils.ConstantesSistema;
+import utils.Msg;
+
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
+
+import java.awt.Toolkit;
+
+public class ManutencaoContato extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	private JLabel lblNome;
@@ -33,7 +43,7 @@ public class ManutencaoContrato extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ManutencaoContrato(int contatoCodigo) {
+	public ManutencaoContato(int contatoCodigo) {
 		
 		this.contatoCodigo = contatoCodigo;
 		
@@ -41,15 +51,30 @@ public class ManutencaoContrato extends JFrame {
 	}
 	
 	private void initialize() {
+		getContentPane().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent ke) {
+				System.out.println(ke.getKeyCode());
+				if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					setVisible(false);
+					dispose();
+				}
+			}
+		});
 		this.isUpdateMode = this.contatoCodigo > 0;
 		
+		setIconImage(Toolkit.getDefaultToolkit().getImage(ManutencaoContato.class.getResource((isUpdateMode ? "/icones/edit_contact.png":"/icones/add_contact.png"))));
 		setTitle((isUpdateMode ? "Contato":"Cadastrar contato"));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 387, 273);
+		
+		int resX = (ConstantesSistema.RESOLUCAO.width / 2) - (387 / 2);
+		int resY = (ConstantesSistema.RESOLUCAO.height / 2) - (273 / 2);
+		
+		setBounds(resX, resY, 387, 273);
 		getContentPane().setLayout(null);
 		
 		this.progressBar = new JProgressBar();
-		this.progressBar.setBounds(10, 209, 351, 14);
+		this.progressBar.setBounds(10, 213, 351, 14);
 		getContentPane().add(this.progressBar);
 		
 		lblNome = new JLabel("Nome");
@@ -89,30 +114,34 @@ public class ManutencaoContrato extends JFrame {
 		getContentPane().add(txtEmail);
 		txtEmail.setColumns(10);
 		
-		btnCadastrar = new JButton((isUpdateMode ? "Salvar":"Cadastrar"));
+		btnCadastrar = new JButton();
+		this.btnCadastrar.setIcon(new ImageIcon(ManutencaoContato.class.getResource((isUpdateMode ? "/icones/save_as.png":"/icones/save.png"))));
+		this.btnCadastrar.setToolTipText("Salvar");
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				saveRecord();
 			}
 		});
-		btnCadastrar.setBounds(144, 166, 89, 23);
+		btnCadastrar.setBounds(219, 154, 48, 48);
 		getContentPane().add(btnCadastrar);
 		
-		btnCancelar = new JButton("Cancelar");
+		btnCancelar = new JButton("");
+		this.btnCancelar.setIcon(new ImageIcon(ManutencaoContato.class.getResource("/icones/cancel.png")));
+		this.btnCancelar.setToolTipText("Cancelar");
 		btnCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
-		btnCancelar.setBounds(237, 166, 89, 23);
+		btnCancelar.setBounds(278, 154, 48, 48);
 		getContentPane().add(btnCancelar);
 		
 		loadRecord();
-		
 	}
 	
 	private void loadRecord(){
 		if (isUpdateMode) {
+			Msg.MsgStatusBar("Carregando dados do contato...", false);
 			progressBar.setIndeterminate(true);
 			btnCadastrar.setEnabled(false);
 			
@@ -129,10 +158,12 @@ public class ManutencaoContrato extends JFrame {
 						txtTelefone.setText(contato.getNumeroTelefone());
 						txtEmail.setText(contato.getEmail());
 					} catch (Exception e) {
+						Msg.MsgStatusBar("Carregando dados do contato... ERRO!");
 						e.printStackTrace();
 					}
 					progressBar.setIndeterminate(false);
 					btnCadastrar.setEnabled(true);
+					Msg.MsgStatusBar("Carregando dados do contato... OK");
 			}}).start();
 		}
 	}
@@ -142,11 +173,13 @@ public class ManutencaoContrato extends JFrame {
 		btnCadastrar.setEnabled(false);
 		btnCancelar.setEnabled(false);
 		
+		
 		new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
 				if (isUpdateMode) {
+					Msg.MsgStatusBar("Atualizando dados do contato...", false);
 					try {
 						if (contato == null){
 							contato = new Contato(contatoCodigo);
@@ -155,11 +188,18 @@ public class ManutencaoContrato extends JFrame {
 						contato.setEndereco(txtEndereco.getText());
 						contato.setNumeroTelefone(txtTelefone.getText());
 						contato.setEmail(txtEmail.getText());
-						contato.Alterar();
+						if(contato.Alterar()){
+							Msg.MsgStatusBar("Atualizando dados do contato... OK");
+							dispose();
+						} else {
+							Msg.MsgStatusBar("Atualizando dados do contato... Nenhuma informação alterada!");
+						}
 					} catch (Exception e) {
+						Msg.MsgStatusBar("Atualizando dados do contato... Erro!");
 						e.printStackTrace();
 					}
 				} else {
+					Msg.MsgStatusBar("Cadastrando contato...", false);
 					String
 						nome = txtNome.getText()
 						,endereco = txtEndereco.getText()
@@ -167,7 +207,12 @@ public class ManutencaoContrato extends JFrame {
 						,email = txtEmail.getText();
 					
 					contato = new Contato(0, nome, endereco, numeroTelefone, email);
-					contato.Inserir();
+					if (contato.Inserir()) {
+						Msg.MsgStatusBar("Cadastrando contato... OK");
+						dispose();
+					} else {
+						Msg.MsgStatusBar("Cadastrando contato... Contato não cadastrado!");
+					}
 				}
 				progressBar.setIndeterminate(false);
 				btnCadastrar.setEnabled(true);

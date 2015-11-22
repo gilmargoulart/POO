@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.ListSelectionModel;
 
+import utils.ConstantesSistema;
 import utils.Msg;
 import conexao.Conexao;
 
@@ -23,11 +24,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JCheckBox;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+
+import entidades.Contato;
+
+import java.awt.Component;
+import javax.swing.ImageIcon;
+import java.awt.Toolkit;
 
 public class CentralContato extends JFrame {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private JTable tblContatos;
 	private JTextField txtFiltrobusca;
@@ -41,10 +48,15 @@ public class CentralContato extends JFrame {
 	private JCheckBox chckbxEndereco;
 	private JCheckBox chckbxEmail;
 	private JCheckBox chckbxTelefone;
+	private JPopupMenu popupMenu;
+	private JMenuItem mntmExluir;
+	private JMenuItem mntmAlterar;
 	/**
 	 * Create the frame.
 	 */
 	public CentralContato() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(CentralContato.class.getResource("/icones/contacts.png")));
+		setResizable(false);
 		setTitle("Central de contatos");
 		initialize();
 		loadRecords();
@@ -53,7 +65,11 @@ public class CentralContato extends JFrame {
 	@SuppressWarnings("serial")
 	private void initialize() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 643, 678);
+		
+		int resX = (ConstantesSistema.RESOLUCAO.width / 2) - (643 / 2);
+		int resY = (ConstantesSistema.RESOLUCAO.height / 2) - (678 / 2);
+				
+		setBounds(resX, resY, 643, 678);
 		getContentPane().setLayout(null);
 		modeloTabela = new DefaultTableModel(
 				new Object[][] {
@@ -79,18 +95,20 @@ public class CentralContato extends JFrame {
 				};
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 73, 607, 530);
+		scrollPane.setBounds(10, 75, 607, 544);
 		getContentPane().add(scrollPane);
 		
 		tblContatos = new JTable();
 		this.tblContatos.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent me) {
-				if (me.getClickCount() == 2) {
+				if (me.getClickCount() == 2 & me.getButton() == MouseEvent.BUTTON1) {
 					openRecord();
 				}
 			}
 		});
+		
+		
 		scrollPane.setViewportView(tblContatos);
 		tblContatos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
@@ -111,66 +129,116 @@ public class CentralContato extends JFrame {
 		this.tblContatos.getColumnModel().getColumn(4).setMinWidth(20);
 		this.tblContatos.getColumnModel().getColumn(4).setMaxWidth(200);
 		
+		this.popupMenu = new JPopupMenu();
+		addPopup(this.tblContatos, this.popupMenu);
+		
+		this.mntmAlterar = new JMenuItem("Alterar");
+		this.mntmAlterar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				openRecord();
+			}
+		});
+		this.mntmAlterar.setActionCommand("Alterar");
+		this.popupMenu.add(this.mntmAlterar);
+		
+		this.mntmExluir = new JMenuItem("Exluir");
+		this.mntmExluir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				deleteRecord();
+			}
+		});
+		this.popupMenu.add(this.mntmExluir);
+		
 		txtFiltrobusca = new JTextField();
+		this.txtFiltrobusca.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				loadRecords();
+			}
+		});
 		this.txtFiltrobusca.setToolTipText("Buscar por c\u00F3digo, nome, endere\u00E7o, email ou telefone.");
 		txtFiltrobusca.setBounds(10, 12, 457, 20);
 		getContentPane().add(txtFiltrobusca);
 		txtFiltrobusca.setColumns(10);
 		
-		btnBuscar = new JButton("Buscar");
+		btnBuscar = new JButton();
+		this.btnBuscar.setIcon(new ImageIcon(CentralContato.class.getResource("/icones/refresh.png")));
+		this.btnBuscar.setToolTipText("Atualizar dados da consulta");
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				loadRecords();
 			}
 		});
-		btnBuscar.setBounds(477, 12, 65, 23);
+		btnBuscar.setBounds(477, 12, 48, 48);
 		getContentPane().add(btnBuscar);
 		
-		btnInserir = new JButton("Inserir");
+		btnInserir = new JButton();
+		this.btnInserir.setIcon(new ImageIcon(CentralContato.class.getResource("/icones/add_contact.png")));
+		this.btnInserir.setToolTipText("Inserir");
 		btnInserir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ManutencaoContrato cc = new ManutencaoContrato(0);
+				ManutencaoContato cc = new ManutencaoContato(0);
 				cc.setVisible(true);
 			}
 		});
-		btnInserir.setBounds(552, 12, 65, 23);
+		btnInserir.setBounds(535, 12, 48, 48);
 		getContentPane().add(btnInserir);
 		
 		this.progressBar = new JProgressBar();
-		this.progressBar.setBounds(10, 614, 607, 14);
+		this.progressBar.setBounds(10, 624, 607, 14);
 		getContentPane().add(this.progressBar);
 		
 		this.chckbxCodigo = new JCheckBox("C\u00F3digo");
+		this.chckbxCodigo.setToolTipText("Indicar se filtra o c\u00F3digo do contato durante a busca.");
 		this.chckbxCodigo.setSelected(true);
 		this.chckbxCodigo.setBounds(10, 34, 65, 20);
 		getContentPane().add(this.chckbxCodigo);
 		
 		this.chckbxNome = new JCheckBox("Nome");
+		this.chckbxNome.setToolTipText("Indicar se filtra o nome do contato durante a busca.");
 		this.chckbxNome.setSelected(true);
 		this.chckbxNome.setBounds(76, 34, 53, 20);
 		getContentPane().add(this.chckbxNome);
 		
 		this.chckbxEndereco = new JCheckBox("Endere\u00E7o");
+		this.chckbxEndereco.setToolTipText("Indicar se filtra o endere\u00E7o do contato durante a busca.");
 		this.chckbxEndereco.setSelected(true);
 		this.chckbxEndereco.setBounds(131, 34, 71, 20);
 		getContentPane().add(this.chckbxEndereco);
 		
 		this.chckbxEmail = new JCheckBox("Email");
+		this.chckbxEmail.setToolTipText("Indicar se filtra o email do contato durante a busca.");
 		this.chckbxEmail.setSelected(true);
 		this.chckbxEmail.setBounds(204, 34, 53, 20);
 		getContentPane().add(this.chckbxEmail);
 		
 		this.chckbxTelefone = new JCheckBox("Telefone");
+		this.chckbxTelefone.setToolTipText("Indicar se filtra o telefone do contato durante a busca.");
 		this.chckbxTelefone.setSelected(true);
 		this.chckbxTelefone.setBounds(259, 34, 76, 20);
 		getContentPane().add(this.chckbxTelefone);
 	}
 	
+	private void deleteRecord() {
+		int row = tblContatos.getSelectedRow();
+		if (row >= 0) {
+			int codigoContato = (Integer)modeloTabela.getValueAt(row, 0);
+			
+			if(new Contato(codigoContato, null, null, null, null).Deletar()){
+				modeloTabela.removeRow(row);
+			}
+		} else {
+			Msg.Erro("Selecione algum registro.", "Nenhum registro selecionado");
+		}
+	}
+
 	private void loadRecords() {
 		
 		progressBar.setIndeterminate(true);
 		txtFiltrobusca.setEditable(false);
 		btnBuscar.setEnabled(false);
+		tblContatos.setEnabled(false);
+		
+		Msg.MsgStatusBar("Carregando contatos...", false);
 		
 		new Thread(new Runnable() {
 			
@@ -260,21 +328,25 @@ public class CentralContato extends JFrame {
 							rs.getInt("ContatoCodigo"),
 							rs.getString("ContatoNome"),
 							rs.getString("ContatoEndereco"),
-							rs.getString("ContatoNumeroTelefone"),
 							rs.getString("ContatoEmail"),
+							rs.getString("ContatoNumeroTelefone"),
 						});
 					}
 					
 				} catch (SQLException e) {
 					e.printStackTrace();
+					Msg.MsgStatusBar("Carregando contatos... Erro!");
 					Msg.Erro(e.getMessage(), "Erro");
 				} catch (Exception e) {
 					e.printStackTrace();
+					Msg.MsgStatusBar("Carregando contatos... Erro!");
 					Msg.Erro(e.getMessage(), "Erro");
 				}
 				progressBar.setIndeterminate(false);
 				txtFiltrobusca.setEditable(true);
 				btnBuscar.setEnabled(true);
+				tblContatos.setEnabled(true);
+				Msg.MsgStatusBar("Carregando contatos... OK");
 			}
 		}).start();	
 		
@@ -284,10 +356,28 @@ public class CentralContato extends JFrame {
 	private void openRecord(){
 		int row = tblContatos.getSelectedRow();
 		if (row >= 0) {
-			int codigoCliente = (Integer)modeloTabela.getValueAt(row, 0);
-			new ManutencaoContrato(codigoCliente).setVisible(true);
+			int codigoContato = (Integer)modeloTabela.getValueAt(row, 0);
+			new ManutencaoContato(codigoContato).setVisible(true);
 		} else {
 			Msg.Erro("Selecione algum registro.", "Nenhum registro selecionado");
 		}
+	}
+	
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
 	}
 }

@@ -19,6 +19,8 @@ import javax.swing.UIManager;
 import utils.ConstantesSistema;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Toolkit;
+import javax.swing.JLabel;
 
 public class MainProgram {
 
@@ -29,6 +31,8 @@ public class MainProgram {
 	private JSeparator separator;
 	private JMenuItem mntmSair;
 	private JMenu mnArquivo;
+	private JMenuBar menuBar_1;
+	public static JLabel LBL_STATUSBAR = new JLabel();
 
 	/**
 	 * Launch the application.
@@ -66,13 +70,18 @@ public class MainProgram {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		this.frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainProgram.class.getResource("/icones/checked_checkbox.png")));
 		this.frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent arg0) {
 				ConstantesSistema.fecharConexoes();
 			}
 		});
-		frame.setBounds(100, 100, 450, 300);
+		
+		int resX = (ConstantesSistema.RESOLUCAO.width / 2) - (624 / 2);
+		int resY = (ConstantesSistema.RESOLUCAO.height / 2) - (300 / 2);
+		
+		frame.setBounds(resX, resY, 624, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		menuBar = new JMenuBar();
@@ -104,6 +113,11 @@ public class MainProgram {
 			}
 		});
 		mnCadastros.add(mntmContato);
+		
+		this.menuBar_1 = new JMenuBar();
+		this.frame.getContentPane().add(this.menuBar_1, BorderLayout.SOUTH);
+		
+		this.menuBar_1.add(LBL_STATUSBAR);
 	}
 
 }
