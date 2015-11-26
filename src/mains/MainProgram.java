@@ -17,9 +17,12 @@ import java.awt.event.ActionListener;
 import javax.swing.UIManager;
 
 import utils.ConstantesSistema;
+import utils.Msg;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Toolkit;
+
 import javax.swing.JLabel;
 
 public class MainProgram {
@@ -33,6 +36,7 @@ public class MainProgram {
 	private JMenu mnArquivo;
 	private JMenuBar menuBar_1;
 	public static JLabel LBL_STATUSBAR = new JLabel();
+	private JMenuItem mntmSobre;
 
 	/**
 	 * Launch the application.
@@ -113,6 +117,15 @@ public class MainProgram {
 			}
 		});
 		mnCadastros.add(mntmContato);
+		
+		this.mntmSobre = new JMenuItem("Sobre");
+		this.mntmSobre.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String sobre = "Gilmar J. A. Goulart" + "\n" + "Jayson Costa" + "\n" + "Daniel Eccel";
+				Msg.Informacao(sobre, "Sobre");
+			}
+		});
+		this.menuBar.add(this.mntmSobre);
 		
 		this.menuBar_1 = new JMenuBar();
 		this.frame.getContentPane().add(this.menuBar_1, BorderLayout.SOUTH);

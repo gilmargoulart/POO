@@ -16,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.swing.JScrollPane;
 import javax.swing.JProgressBar;
 
@@ -30,7 +29,9 @@ import javax.swing.JMenuItem;
 import entidades.Contato;
 
 import java.awt.Component;
+
 import javax.swing.ImageIcon;
+
 import java.awt.Toolkit;
 
 public class CentralContato extends JFrame {
@@ -51,6 +52,7 @@ public class CentralContato extends JFrame {
 	private JPopupMenu popupMenu;
 	private JMenuItem mntmExluir;
 	private JMenuItem mntmAlterar;
+	private JButton btnExportarCSV;
 	/**
 	 * Create the frame.
 	 */
@@ -180,8 +182,19 @@ public class CentralContato extends JFrame {
 				cc.setVisible(true);
 			}
 		});
-		btnInserir.setBounds(535, 12, 48, 48);
+		btnInserir.setBounds(528, 12, 48, 48);
 		getContentPane().add(btnInserir);
+		
+		this.btnExportarCSV = new JButton();
+		this.btnExportarCSV.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				exportContatosToCSV();
+			}
+		});
+		this.btnExportarCSV.setIcon(new ImageIcon(CentralContato.class.getResource("/icones/export_csv.png")));
+		this.btnExportarCSV.setToolTipText("Exportar contatos para arquivo CSV");
+		this.btnExportarCSV.setBounds(579, 12, 48, 48);
+		getContentPane().add(this.btnExportarCSV);
 		
 		this.progressBar = new JProgressBar();
 		this.progressBar.setBounds(10, 624, 607, 14);
@@ -258,7 +271,8 @@ public class CentralContato extends JFrame {
 						//Verificar se é um número
 						codigoCliente = Integer.parseInt(txtFiltrobusca.getText());
 					} catch (Exception e) {
-						isFiltrarCodigo = false;
+						codigoCliente = 0;
+						//isFiltrarCodigo = false;
 					}
 				}
 				
@@ -336,11 +350,11 @@ public class CentralContato extends JFrame {
 				} catch (SQLException e) {
 					e.printStackTrace();
 					Msg.MsgStatusBar("Carregando contatos... Erro!");
-					Msg.Erro(e.getMessage(), "Erro");
+					Msg.Erro(e.getMessage() + "\n" + e.getStackTrace(), "Erro");
 				} catch (Exception e) {
 					e.printStackTrace();
 					Msg.MsgStatusBar("Carregando contatos... Erro!");
-					Msg.Erro(e.getMessage(), "Erro");
+					Msg.Erro(e.getMessage() + "\n" + e.getStackTrace(), "Erro");
 				}
 				progressBar.setIndeterminate(false);
 				txtFiltrobusca.setEditable(true);
@@ -361,6 +375,64 @@ public class CentralContato extends JFrame {
 		} else {
 			Msg.Erro("Selecione algum registro.", "Nenhum registro selecionado");
 		}
+	}
+	
+	private void exportContatosToCSV() {
+		
+		Msg.Aviso("Implementação pendente... :(", "Recurso indispoível :(");
+		
+		if (modeloTabela.getRowCount() <= 0) {
+			Msg.Aviso("Nenhum contato para exportar. :(", "Sem contatos");
+		} else {
+			/*
+			String filePath = "";
+			JFileChooser escolheArq = new JFileChooser();
+					
+		    FileNameExtensionFilter filter = new FileNameExtensionFilter("Arquivo csv", "csv");
+		    escolheArq.setFileFilter(filter);
+		    
+		    int returnVal = escolheArq.showOpenDialog(null);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		    	filePath = escolheArq.getSelectedFile().getAbsolutePath();
+		    	System.out.println("Caminho arquivo selecionado: " + filePath);
+		    	
+		    	Msg.MsgStatusBar("Exportando arquivo para \"" + filePath + "\"...");
+		    	try {
+					
+		    		FileWriter arquivo = new FileWriter(filePath);
+					PrintWriter pWriter = new PrintWriter(filePath); //Gravar no arquivo
+					
+					pWriter.printf(Contato.getCsvLineTitle());
+					Contato c;
+					
+					Vector <Object> dados = modeloTabela.getDataVector();
+					//Vector v1 = tblContatos.getColumnModel().getColumns();
+					//tblContatos.
+					
+					for(Object v : dados) {
+						//c = new Contato(codigo, nome, endereco, numeroTelefone, email);
+						//pWriter.printf(c.getCsvLine());
+						System.out.println(v[0]);
+						System.out.println(v[1]);
+						System.out.println(v[2]);
+						System.out.println(v[3]);
+						System.out.println(v[4]);
+					}
+					pWriter.close();
+					arquivo.close();
+		    			
+	    			Msg.MsgStatusBar("Exportando arquivo para \"" + filePath + "\"... OK", false);
+				} catch (IOException e) {
+					e.printStackTrace();
+					Msg.MsgStatusBar("Exportando arquivo para \"" + filePath + "\"... ERRO", false);
+					Msg.Erro(e.getMessage(), "Erro exportando arquivo");
+				}
+				filePath = null;
+				
+		    }
+			 */
+		}
+		
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 
+import utils.ConstantesSistema;
 import utils.Msg;
 import conexao.Conexao;
 
@@ -17,7 +18,6 @@ public class Contato {
 	private String endereco;
 	private String numeroTelefone;
 	private String email;
-	
 	
 	public Contato() {
 		
@@ -169,6 +169,20 @@ public class Contato {
 	
 	public void exibirDados() {
 		System.out.println(getCodigo() + " - " + getNome());
+	}
+	
+	public static String getCsvLineTitle(){
+		String csvLineTitle = "Código;Nome;Endereço;Telefone;E-Mail\n";
+		return csvLineTitle;
+	}
+	
+	public String getCsvLine(){
+		String csvLine = "";
+		String csvSeparator = ConstantesSistema.CSV_SEPARATOR;
+		
+		csvLine = getCodigo() + csvSeparator + getNome() + csvSeparator + getEndereco() + csvSeparator + getNumeroTelefone() + csvSeparator + getEmail() + "\n";
+		
+		return csvLine;
 	}
 	
 	public int getCodigo() {

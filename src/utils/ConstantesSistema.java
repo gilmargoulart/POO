@@ -10,6 +10,7 @@ public class ConstantesSistema {
 	public static String VERSAO_SISTEMA = "1.0.4";
 	public static Dimension RESOLUCAO = Toolkit.getDefaultToolkit().getScreenSize();
 	public static int WAIT_TIMEOUT_MSG_STATUSBAR = 2000;
+	public static String CSV_SEPARATOR = ";";
 	
 	public static void inicioSistema(){
 		//new Conexao().conect();
